@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+*.log.*
+.env
+npm-debug.log*
+
+# Node modules
+node_modules
+
+# Python
+__pycache__
+venv
+*.pyc
+
+# macOs
+.DS_Store
+
+# Settings
+*.vscode-root
+
+#repo git embarqué
+*/.git
+
+# coverage
+app/coverage/.coverage
+app/coverage/html_coverage
+app/coverage/test-reports

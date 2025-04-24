@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - db_glados:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=glados
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - ${ADMINER_PORT}:8080
+    depends_on:
+      - db
+
+  server:
+    image: 'glados/api'
+    build:
+      context: .
+      cache_from:
+        - 'glados/api'
+    command: flask run --host 0.0.0.0
+    volumes:
+      - ./app:/app
+    ports:
+      - ${SERVER_PORT:-5001}:5001
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  db_glados:

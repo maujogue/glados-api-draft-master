@@ -12,3 +12,5 @@ api.add_resource(misc_resources.VersionAPI, "/")
 
 # Entities endpoints
 api.add_resource(entity_resources.EntitiesAPI, "/entities")
+api.add_resource(entity_resources.RoomsAPI, "/rooms")
+api.add_resource(entity_resources.TypesAPI, "/types")

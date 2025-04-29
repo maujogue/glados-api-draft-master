@@ -5,7 +5,9 @@ from glados.models import Entity
 
 
 class EntitiesRequestSerializer(ma.Schema):
-    type = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityType]))
+    type = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityType] + ["all"]))
+    room = fields.String(required=False)
+    status = fields.String(required=False, validate=validate.OneOf(["on", "off", "unavailable", "all"]))
 
 
 class EntitySerializer(ma.Schema):

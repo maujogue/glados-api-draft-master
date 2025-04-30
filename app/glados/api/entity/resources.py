@@ -37,10 +37,6 @@ class EntitiesAPI(Resource):
 		serializer = EntityResponseSerializer()
 		return serializer.dump(entity), 200
 
-class RoomsAPI(Resource):
-	def get(self):
-		rooms = Room.query.all()
-		return {"rooms": [{"id": str(room.id), "name": room.name} for room in rooms]}
 
 class TypesAPI(Resource):
 	def get(self):

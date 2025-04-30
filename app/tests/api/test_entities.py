@@ -104,7 +104,7 @@ def test_get_entities_with_type_filter(client, entities, mocker):
 
 
 def test_get_entities_with_room_filter(client, entities, mocker):
-    response = client.get("/entities?room=Kitchen")
+    response = client.get(f"/entities?room={uuid.UUID(int=1)}")
 
     assert response.status_code == 200
     assert response.json == [

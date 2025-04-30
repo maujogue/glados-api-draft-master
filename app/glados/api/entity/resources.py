@@ -1,9 +1,11 @@
 from flask import request
 from flask_restful import Resource
 
-from glados.api.entity.serializers import EntitiesRequestSerializer, EntityResponseSerializer
-from glados.repositories.entities import get_entities, update_entity_status, update_entity_value, get_all_rooms
+from glados.api.entity.serializers import EntitiesRequestSerializer, EntityResponseSerializer, EntityUpdateSerializer
+from glados.repositories.entities import get_entities, update_entity_status, update_entity_value, get_all_rooms, get_entity_by_id, update_entity_general
 from glados import constants
+from glados.models.room import Room
+from marshmallow import ValidationError
 
 
 class EntitiesAPI(Resource):
@@ -37,10 +39,34 @@ class EntitiesAPI(Resource):
 
 class RoomsAPI(Resource):
 	def get(self):
-		rooms = get_all_rooms()
-		return {"rooms": rooms}, 200
+		rooms = Room.query.all()
+		return {"rooms": [{"id": str(room.id), "name": room.name} for room in rooms]}
 
 class TypesAPI(Resource):
 	def get(self):
 		types = [t.name for t in constants.EntityType]
 		return {"types": types}, 200
+
+class EntityAPI(Resource):
+	def patch(self, entity_id):
+		data = request.get_json()
+		serializer = EntityUpdateSerializer()
+		try:
+			validated_data = serializer.load(data)
+		except ValidationError as err:
+			return {"errors": err.messages}, 422
+
+		try:
+			entity = update_entity_general(
+				entity_id,
+				name=validated_data.get("name"),
+				type=validated_data.get("type"),
+				room_id=validated_data.get("room_id"),
+			)
+			if not entity:
+				raise Exception
+		except Exception as e:
+			return {"message": "Entity not found or update failed"}, 404
+
+		response_serializer = EntityResponseSerializer()
+		return response_serializer.dump(entity), 200

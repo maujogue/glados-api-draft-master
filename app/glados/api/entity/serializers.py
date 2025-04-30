@@ -9,7 +9,11 @@ class EntitiesRequestSerializer(ma.Schema):
     room = fields.String(required=False)
     status = fields.String(required=False, validate=validate.OneOf(["on", "off", "unavailable", "all"]))
 
-
+class EntityUpdateSerializer(ma.Schema):
+    name = fields.String(required=False)
+    type = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityType]))
+    room_id = fields.UUID(required=False, allow_none=True)
+    
 class EntitySerializer(ma.Schema):
     created_at = fields.DateTime("%Y-%m-%dT%H:%M:%S")
 
@@ -27,4 +31,9 @@ class EntitySerializer(ma.Schema):
 
 
 class EntityResponseSerializer(EntitySerializer):
+    """
+    Serializer used for returning Entity objects in API responses.
+    Inherits from EntitySerializer to include all the base Entity fields
+    like id, name, type, status, value and created_at.
+    """
     pass

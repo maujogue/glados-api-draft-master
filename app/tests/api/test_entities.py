@@ -159,4 +159,100 @@ def test_get_entities_with_multiple_filters(client, entities, mocker):
     ]
 
 
+def test_update_entity_name(client, entities, mocker):
+    entity_id = "00000000-0000-0000-0000-000000000001"
+    response = client.patch(f"/entities/{entity_id}", json={
+        "name": "Updated Light"
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        "id": entity_id,
+        "name": "Updated Light",
+        "type": "light",
+        "status": "off",
+        "value": None,
+        "created_at": mocker.ANY
+    }
+
+def test_update_entity_type(client, entities, mocker):
+    entity_id = "00000000-0000-0000-0000-000000000001"
+    response = client.patch(f"/entities/{entity_id}", json={
+        "type": "switch"
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        "id": entity_id,
+        "name": "Ceiling Light",
+        "type": "switch",
+        "status": "off",
+        "value": None,
+        "created_at": mocker.ANY
+    }
+
+def test_update_entity_room(client, entities, mocker):
+    entity_id = "00000000-0000-0000-0000-000000000001"
+    new_room_id = "00000000-0000-0000-0000-000000000002"  # Living Room
+    response = client.patch(f"/entities/{entity_id}", json={
+        "room_id": new_room_id
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        "id": entity_id,
+        "name": "Ceiling Light",
+        "type": "light",
+        "status": "off",
+        "value": None,
+        "created_at": mocker.ANY
+    }
+
+def test_update_entity_multiple_fields(client, entities, mocker):
+    entity_id = "00000000-0000-0000-0000-000000000001"
+    new_room_id = "00000000-0000-0000-0000-000000000002"  # Living Room
+    response = client.patch(f"/entities/{entity_id}", json={
+        "name": "New Light",
+        "type": "switch",
+        "room_id": new_room_id
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        "id": entity_id,
+        "name": "New Light",
+        "type": "switch",
+        "status": "off",
+        "value": None,
+        "created_at": mocker.ANY
+    }
+
+def test_update_entity_not_found(client):
+    entity_id = "00000000-0000-0000-0000-000000000999"  # Non-existent ID
+    response = client.patch(f"/entities/{entity_id}", json={
+        "name": "New Name"
+    })
+
+    assert response.status_code == 404
+    assert response.json == {"message": "Entity not found or update failed"}
+
+def test_update_entity_invalid_type(client, entities):
+    entity_id = "00000000-0000-0000-0000-000000000001"
+    response = client.patch(f"/entities/{entity_id}", json={
+        "type": "invalid_type"
+    })
+
+    assert response.status_code == 422
+    assert "type" in response.json["errors"]
+
+def test_update_entity_invalid_room(client, entities):
+    entity_id = "00000000-0000-0000-0000-000000000001"
+    response = client.patch(f"/entities/{entity_id}", json={
+        "room_id": "00000000-0000-0000-0000-000000000999"  # Non-existent room
+    })
+
+    assert response.status_code == 404
+    assert response.json == {"message": "Entity not found or update failed"}
+
+
 

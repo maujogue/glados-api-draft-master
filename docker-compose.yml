@@ -27,6 +27,9 @@ services:
     command: flask run --host 0.0.0.0 --port ${SERVER_PORT:-5001}
     volumes:
       - ./app:/app
+      - ${SECRETS_FOLDER}:/app/secrets/
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/gcloud-key.json
     ports:
       - ${SERVER_PORT:-5001}:5001
     env_file:

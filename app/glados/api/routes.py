@@ -13,6 +13,7 @@ api.add_resource(misc_resources.VersionAPI, "/")
 
 # Entities endpoints
 api.add_resource(entity_resources.EntitiesAPI, "/entities")
+api.add_resource(entity_resources.EntitiesTTSAPI, "/entities/tts")
 api.add_resource(entity_resources.EntityAPI, "/entities/<string:entity_id>")
 api.add_resource(entity_resources.TypesAPI, "/entities/types")
 

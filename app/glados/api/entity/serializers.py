@@ -9,6 +9,10 @@ class EntitiesRequestSerializer(ma.Schema):
     room = fields.String(required=False)
     status = fields.String(required=False, validate=validate.OneOf(["on", "off", "unavailable", "all"]))
 
+class EntitiesTTSRequestSerializer(EntitiesRequestSerializer):
+    language = fields.String(required=False, validate=validate.OneOf(["en-US", "fr-FR", "es-ES"]))
+    voice = fields.String(required=False)
+	
 class EntityUpdateSerializer(ma.Schema):
     name = fields.String(required=False)
     type = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityType]))

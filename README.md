@@ -14,6 +14,16 @@ To do this, copy the contents of the `.env.example` file into a new `.env`.
 cp .env.example .env
 ```
 
+### AI summary feature
+
+Requirements in the .env: 
+- GOOGLE_API_KEY : the gemini api key for natural language summary
+- SECRETS_FOLDER : folder which includes your google cloud voice synthesizer json credentials. For human voice synthesis. Follow this structure :
+```
+└── secrets/
+    └── gcloud-key.json
+```
+
 ### Build container
 Then it is necessary to build the container and initiate the database.
 ```

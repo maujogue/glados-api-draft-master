@@ -254,5 +254,43 @@ def test_update_entity_invalid_room(client, entities):
     assert response.status_code == 404
     assert response.json == {"message": "Entity not found or update failed"}
 
+def test_entities_tts_success(client, entities, mocker):
+    # Mock Gemini API response
+    mocker.patch("requests.post", return_value=mocker.Mock(json=lambda: {
+        "candidates": [{"content": {"parts": [{"text": "Summary from Gemini."}]}}]
+    }))
+    # Mock Google TTS response
+    class FakeTTSResponse:
+        audio_content = b"fake-audio"
+    mock_tts_client = mocker.Mock()
+    mock_tts_client.synthesize_speech.return_value = FakeTTSResponse()
+    mocker.patch("google.cloud.texttospeech.TextToSpeechClient", return_value=mock_tts_client)
+
+    response = client.get("/entities/tts?language=en-US")
+    assert response.status_code == 200
+    data = response.json
+    assert "summary" in data and data["summary"] == "Summary from Gemini."
+    assert "audio_base64" in data and data["audio_base64"]
+    assert data["language"] == "en-US"
+    assert data["voice"] == "default"
+
+def test_entities_tts_gemini_error(client, entities, mocker):
+    # Patch Gemini API to raise error
+    mocker.patch("requests.post", side_effect=Exception("Gemini down"))
+    response = client.get("/entities/tts?language=en-US")
+    assert response.status_code == 503
+    assert "Gemini API error" in response.json["error"]
+
+def test_entities_tts_tts_error(client, entities, mocker):
+    # Mock Gemini API response
+    mocker.patch("requests.post", return_value=mocker.Mock(json=lambda: {
+        "candidates": [{"content": {"parts": [{"text": "Summary from Gemini."}]}}]
+    }))
+    # Patch TTS to raise error
+    mocker.patch("google.cloud.texttospeech.TextToSpeechClient", side_effect=Exception("TTS down"))
+    response = client.get("/entities/tts?language=en-US")
+    assert response.status_code == 500
+    assert "TTS API error" in response.json["error"]
+
 
 
